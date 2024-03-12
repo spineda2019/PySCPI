@@ -97,7 +97,7 @@ fn send_repeated_message(
 }
 
 #[pymodule]
-fn scpi_sender_pylib(_py: Python, m: &PyModule) -> PyResult<()> {
+fn py_scpi(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(send_message, m)?)?;
     m.add_function(wrap_pyfunction!(send_repeated_message, m)?)?;
     Ok(())

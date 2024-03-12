@@ -21,7 +21,7 @@ mod tests {
         str::FromStr,
     };
 
-    use crate::{networking::NetworkMode, send_scpi_message};
+    use crate::{networking::NetworkMode, send_repeated_scpi_message, send_scpi_message};
 
     #[test]
     fn test_send_udp_message() -> Result<(), AddrParseError> {
@@ -32,6 +32,27 @@ mod tests {
         const LOCAL_PORT: u16 = 42;
 
         assert!(send_scpi_message(MESSAGE, MODE, &remote_client, REMOTE_PORT, LOCAL_PORT).is_ok());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_repeated_udp_messages() -> Result<(), AddrParseError> {
+        const MESSAGE: &str = "*IDN";
+        const MODE: NetworkMode = NetworkMode::Udp;
+        let remote_client: IpAddr = IpAddr::from_str("192.168.1.70")?;
+        const REMOTE_PORT: u16 = 5025;
+        const LOCAL_PORT: u16 = 42;
+
+        assert!(send_repeated_scpi_message(
+            MESSAGE,
+            MODE,
+            &remote_client,
+            REMOTE_PORT,
+            LOCAL_PORT,
+            Some(10)
+        )
+        .is_ok());
 
         Ok(())
     }

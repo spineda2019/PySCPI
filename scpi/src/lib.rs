@@ -42,17 +42,13 @@ pub fn send_scpi_message(
             return Err(Error::new(ErrorKind::Interrupted, msg));
         }
     };
-    dbg!("Successful localhost: {}", &local_host);
     let local_address = SocketAddr::new(local_host, local_port);
-    dbg!("Successful sockaddr: {}", &local_address);
 
     let remote_address = SocketAddr::new(*remote_client, remote_port);
-    dbg!("Successful sockaddr: {}", &remote_address);
 
     match mode {
         NetworkMode::Udp => {
             let local_socket: UdpSocket = UdpSocket::bind(local_address)?;
-            dbg!("Successful socketbind: {}", &local_socket);
             Ok(local_socket.send_to(scpi_message, remote_address)?)
         }
         NetworkMode::Tcp => {

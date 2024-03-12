@@ -1,3 +1,4 @@
 *.lock
 target/
+python_test/
 

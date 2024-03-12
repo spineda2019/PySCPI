@@ -14,8 +14,50 @@
    limitations under the License.
 */
 
+mod networking;
 mod unit_tests;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::{
+    io::{Error, ErrorKind, Write},
+    net::{IpAddr, SocketAddr, TcpStream, UdpSocket},
+    str::FromStr,
+};
+
+use networking::NetworkMode;
+
+pub fn send_scpi_message(
+    message: &str,
+    mode: &NetworkMode,
+    remote_client: &IpAddr,
+    remote_port: u16,
+    local_port: u16,
+) -> Result<usize, Error> {
+    let clean_message: String = format!("{}\r\n", message.trim());
+    let scpi_message: &[u8] = clean_message.as_bytes();
+    let local_host: IpAddr = match IpAddr::from_str("127.0.0.1") {
+        Ok(x) => x,
+        Err(_) => {
+            let msg: &str = "Creating localhost object failed...";
+            eprint!("{}", msg);
+            return Err(Error::new(ErrorKind::Interrupted, msg));
+        }
+    };
+    let local_address = SocketAddr::new(local_host, local_port);
+
+    let remote_address = SocketAddr::new(*remote_client, remote_port);
+
+    match mode {
+        NetworkMode::Udp => {
+            let local_socket: UdpSocket = UdpSocket::bind(local_address)?;
+            local_socket.send(scpi_message)?;
+            Ok(scpi_message.len())
+        }
+        NetworkMode::Tcp => {
+            let mut local_socket: TcpStream = TcpStream::connect(remote_address)?;
+            local_socket.write_all(scpi_message)?;
+            Ok(scpi_message.len())
+        }
+        NetworkMode::UdpMulticast => todo!(),
+        NetworkMode::TcpMulticast => todo!(),
+    }
 }

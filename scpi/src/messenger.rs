@@ -20,6 +20,7 @@ use std::{
     str::FromStr,
 };
 
+use crate::duty_cycle::DutyCycleMessage;
 use crate::networking::{NetworkMode, NetworkSender};
 
 pub struct Messenger {
@@ -94,6 +95,28 @@ impl Messenger {
             NetworkSender::Tcp(y) => {
                 y.write_all(scpi_message)?;
                 Ok(scpi_message.len())
+            }
+        }
+    }
+
+    pub fn send_duty_cycled_message(&mut self, message: &DutyCycleMessage) -> Result<(), Error> {
+        let (first_time, second_time): (u64, u64) = message.get_times();
+        let (first_message, second_message): (&str, &str) = message.get_messages();
+
+        let first_interval = std::time::Duration::from_millis(first_time);
+        let second_interval = std::time::Duration::from_millis(second_time);
+
+        loop {
+            let start: std::time::Instant = std::time::Instant::now();
+            self.send_message(first_message)?;
+            while start.elapsed() < first_interval {
+                std::hint::spin_loop();
+            }
+
+            let start: std::time::Instant = std::time::Instant::now();
+            self.send_message(second_message)?;
+            while start.elapsed() < second_interval {
+                std::hint::spin_loop();
             }
         }
     }

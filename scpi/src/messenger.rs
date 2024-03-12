@@ -24,7 +24,6 @@ use crate::networking::{NetworkMode, NetworkSender};
 
 pub struct Messenger {
     destination_address: SocketAddr,
-    local_address: SocketAddr,
     sending_socket: NetworkSender,
 }
 
@@ -45,12 +44,12 @@ impl Messenger {
         };
         let local_address = SocketAddr::new(local_host, local_port);
         let remote_address = SocketAddr::new(*remote_client, remote_port);
+
         match mode {
             NetworkMode::Udp => {
                 let local_socket: UdpSocket = UdpSocket::bind(local_address)?;
                 Ok(Self {
                     destination_address: remote_address,
-                    local_address,
                     sending_socket: NetworkSender::Udp(local_socket),
                 })
             }
@@ -58,12 +57,32 @@ impl Messenger {
                 let local_socket: TcpStream = TcpStream::connect(remote_address)?;
                 Ok(Self {
                     destination_address: remote_address,
-                    local_address,
                     sending_socket: NetworkSender::Tcp(local_socket),
                 })
             }
-            NetworkMode::UdpMulticast => todo!(),
-            NetworkMode::TcpMulticast => todo!(),
+            NetworkMode::UdpMulticast => {
+                let local_socket: UdpSocket = UdpSocket::bind(local_address)?;
+                match [&local_host, remote_client] {
+                    [IpAddr::V4(x), IpAddr::V4(y)] => {
+                        local_socket.join_multicast_v4(y, x)?;
+                    }
+                    [_, _] => {
+                        const MESSAGE: &str = "Ipv6 Addresses not yet supported";
+                        eprint!("Multicast Join Failed: {}", MESSAGE);
+                        return Err(Error::new(ErrorKind::Interrupted, MESSAGE));
+                    }
+                }
+
+                Ok(Self {
+                    destination_address: remote_address,
+                    sending_socket: NetworkSender::Udp(local_socket),
+                })
+            }
+            NetworkMode::TcpMulticast => {
+                const MESSAGE: &str = "Tcp Multicast not yet supported";
+                eprint!("Multicast Join Failed: {}", MESSAGE);
+                Err(Error::new(ErrorKind::Interrupted, MESSAGE))
+            }
         }
     }
 

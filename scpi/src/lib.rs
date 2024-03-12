@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+mod messenger;
 mod networking;
 mod unit_tests;
 
@@ -23,6 +24,7 @@ use std::{
     str::FromStr,
 };
 
+use messenger::Messenger;
 use networking::NetworkMode;
 
 pub fn send_scpi_message(
@@ -58,5 +60,30 @@ pub fn send_scpi_message(
         }
         NetworkMode::UdpMulticast => todo!(),
         NetworkMode::TcpMulticast => todo!(),
+    }
+}
+
+pub fn send_repeated_scpi_message(
+    message: &str,
+    mode: NetworkMode,
+    remote_client: &IpAddr,
+    remote_port: u16,
+    local_port: u16,
+    repititions: Option<usize>,
+) -> Result<usize, Error> {
+    let messenger: Messenger = Messenger::new(local_port, remote_port, remote_client, mode)?;
+
+    match repititions {
+        Some(number) => {
+            let result: usize = 0;
+            for _ in 0..number {
+                // This is not as good for performance
+                todo!();
+            }
+            Ok(result)
+        }
+        None => loop {
+            todo!()
+        },
     }
 }

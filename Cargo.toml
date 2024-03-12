@@ -1,0 +1,3 @@
+[workspace]
+members = ["scpi", "python_bindings"]
+resolver = "2"

@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+mod duty_cycle;
 mod messenger;
 pub mod networking;
 mod unit_tests;
@@ -64,4 +65,16 @@ pub fn send_repeated_scpi_message(
             messenger.send_message(message)?;
         },
     }
+}
+
+pub fn send_duty_cycled_message(
+    messages: (&str, &str),
+    millisecond_periods: (f64, f64),
+    mode: NetworkMode,
+    remote_client: &IpAddr,
+    remote_port: u16,
+    local_port: u16,
+    repititions: Option<usize>,
+) -> Result<usize, Error> {
+    todo!()
 }

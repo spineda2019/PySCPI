@@ -19,9 +19,51 @@ use std::net::IpAddr;
 use std::str::FromStr;
 
 use pyo3::prelude::*;
+use scpi::duty_cycle::DutyCycleMessage;
 use scpi::networking::NetworkMode;
+use scpi::send_duty_cycled_message as lib_send_duty_cycled_message;
 use scpi::send_repeated_scpi_message;
 use scpi::send_scpi_message;
+
+#[pyfunction]
+fn send_dutycycled_message(
+    messages: (&str, &str),
+    times: (u64, u64),
+    mode: u8,
+    remote_client: &str,
+    remote_port: u16,
+    local_port: u16,
+) -> isize {
+    let network_mode: NetworkMode = match mode {
+        0 => NetworkMode::Udp,
+        1 => NetworkMode::Tcp,
+        2 => NetworkMode::UdpMulticast,
+        3 => NetworkMode::TcpMulticast,
+        _ => return -1,
+    };
+
+    let remote_client_address: IpAddr = match IpAddr::from_str(remote_client) {
+        Ok(x) => x,
+        Err(_) => return -2,
+    };
+
+    let (first_message, second_message): (&str, &str) = messages;
+    let (first_time, second_time): (u64, u64) = times;
+
+    let dutycycled_message: DutyCycleMessage =
+        DutyCycleMessage::new(first_time, second_time, first_message, second_message);
+
+    match lib_send_duty_cycled_message(
+        &dutycycled_message,
+        network_mode,
+        &remote_client_address,
+        remote_port,
+        local_port,
+    ) {
+        Ok(_) => 0, // impossible
+        Err(_) => -3,
+    }
+}
 
 #[pyfunction]
 fn send_message(
@@ -100,5 +142,6 @@ fn send_repeated_message(
 fn py_scpi(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(send_message, m)?)?;
     m.add_function(wrap_pyfunction!(send_repeated_message, m)?)?;
+    m.add_function(wrap_pyfunction!(send_dutycycled_message, m)?)?;
     Ok(())
 }

@@ -46,9 +46,17 @@ pub fn send_repeated_scpi_message(
 
     match repititions {
         Some(number) => {
+            if number == 0 {
+                return Ok(0);
+            }
+
             let mut result: usize = 0;
-            for _ in 0..number {
-                result = messenger.send_message(message)?;
+            for i in 0..number {
+                if i == 0 {
+                    result = messenger.send_message(message)?;
+                } else {
+                    messenger.send_message(message)?;
+                }
             }
             Ok(result)
         }

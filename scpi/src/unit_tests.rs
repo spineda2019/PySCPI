@@ -15,4 +15,24 @@
 */
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use std::{
+        net::{AddrParseError, IpAddr},
+        str::FromStr,
+    };
+
+    use crate::{networking::NetworkMode, send_scpi_message};
+
+    #[test]
+    fn test_send_udp_message() -> Result<(), AddrParseError> {
+        const MESSAGE: &str = "*IDN";
+        const MODE: NetworkMode = NetworkMode::Udp;
+        let remote_client: IpAddr = IpAddr::from_str("192.168.1.70")?;
+        const REMOTE_PORT: u16 = 5025;
+        const LOCAL_PORT: u16 = 42;
+
+        assert!(send_scpi_message(MESSAGE, &MODE, &remote_client, REMOTE_PORT, LOCAL_PORT).is_ok());
+
+        Ok(())
+    }
+}

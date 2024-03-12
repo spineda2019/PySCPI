@@ -34,7 +34,7 @@ pub fn send_scpi_message(
 ) -> Result<usize, Error> {
     let clean_message: String = format!("{}\r\n", message.trim());
     let scpi_message: &[u8] = clean_message.as_bytes();
-    let local_host: IpAddr = match IpAddr::from_str("127.0.0.1") {
+    let local_host: IpAddr = match IpAddr::from_str("0.0.0.0") {
         Ok(x) => x,
         Err(_) => {
             let msg: &str = "Creating localhost object failed...";
@@ -42,15 +42,18 @@ pub fn send_scpi_message(
             return Err(Error::new(ErrorKind::Interrupted, msg));
         }
     };
+    dbg!("Successful localhost: {}", &local_host);
     let local_address = SocketAddr::new(local_host, local_port);
+    dbg!("Successful sockaddr: {}", &local_address);
 
     let remote_address = SocketAddr::new(*remote_client, remote_port);
+    dbg!("Successful sockaddr: {}", &remote_address);
 
     match mode {
         NetworkMode::Udp => {
             let local_socket: UdpSocket = UdpSocket::bind(local_address)?;
-            local_socket.send(scpi_message)?;
-            Ok(scpi_message.len())
+            dbg!("Successful socketbind: {}", &local_socket);
+            Ok(local_socket.send_to(scpi_message, remote_address)?)
         }
         NetworkMode::Tcp => {
             let mut local_socket: TcpStream = TcpStream::connect(remote_address)?;

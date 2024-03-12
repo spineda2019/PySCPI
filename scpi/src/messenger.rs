@@ -15,7 +15,7 @@
 */
 
 use std::{
-    io::{Error, ErrorKind},
+    io::{Error, ErrorKind, Write},
     net::{IpAddr, SocketAddr, TcpStream, UdpSocket},
     str::FromStr,
 };
@@ -67,10 +67,15 @@ impl Messenger {
         }
     }
 
-    pub fn send_message(&self, message: &str) -> Result<usize, Error> {
-        match &self.sending_socket {
-            NetworkSender::Udp(x) => todo!(),
-            NetworkSender::Tcp(y) => todo!(),
+    pub fn send_message(&mut self, message: &str) -> Result<usize, Error> {
+        let clean_message: String = format!("{}\r\n", message.trim());
+        let scpi_message: &[u8] = clean_message.as_bytes();
+        match &mut self.sending_socket {
+            NetworkSender::Udp(x) => Ok(x.send_to(scpi_message, self.destination_address)?),
+            NetworkSender::Tcp(y) => {
+                y.write_all(scpi_message)?;
+                Ok(scpi_message.len())
+            }
         }
     }
 }

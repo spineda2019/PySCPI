@@ -14,13 +14,14 @@
    limitations under the License.
 */
 
-mod duty_cycle;
+pub mod duty_cycle;
 mod messenger;
 pub mod networking;
 mod unit_tests;
 
 use std::{io::Error, net::IpAddr};
 
+use duty_cycle::DutyCycleMessage;
 use messenger::Messenger;
 use networking::NetworkMode;
 
@@ -68,13 +69,12 @@ pub fn send_repeated_scpi_message(
 }
 
 pub fn send_duty_cycled_message(
-    messages: (&str, &str),
-    millisecond_periods: (f64, f64),
+    duty_cycle_message: &DutyCycleMessage,
     mode: NetworkMode,
     remote_client: &IpAddr,
     remote_port: u16,
     local_port: u16,
-    repititions: Option<usize>,
-) -> Result<usize, Error> {
-    todo!()
+) -> Result<(), Error> {
+    let mut messenger: Messenger = Messenger::new(local_port, remote_port, remote_client, mode)?;
+    messenger.send_duty_cycled_message(duty_cycle_message)
 }

@@ -15,7 +15,7 @@
 */
 
 mod messenger;
-mod networking;
+pub mod networking;
 mod unit_tests;
 
 use std::{io::Error, net::IpAddr};

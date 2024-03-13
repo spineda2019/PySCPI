@@ -99,6 +99,14 @@ impl Messenger {
         }
     }
 
+    pub fn send_list_of_messages(&mut self, messages: &[&str]) -> Result<(), Error> {
+        for message in messages {
+            self.send_message(message)?;
+        }
+
+        Ok(())
+    }
+
     pub fn send_duty_cycled_message(&mut self, message: &DutyCycleMessage) -> Result<(), Error> {
         let (first_time, second_time): (u64, u64) = message.get_times();
         let (first_message, second_message): (&str, &str) = message.get_messages();

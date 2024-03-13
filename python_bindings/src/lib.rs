@@ -23,8 +23,8 @@ use pyo3::prelude::*;
 use scpi::duty_cycle::DutyCycleMessage;
 use scpi::networking::NetworkMode;
 use scpi::send_duty_cycled_message as lib_send_duty_cycled_message;
-use scpi::send_repeated_scpi_message;
-use scpi::send_scpi_message;
+use scpi::send_repeated_scpi_message as lib_send_repeated_scpi_message;
+use scpi::send_scpi_message as lib_send_scpi_message;
 
 #[pyfunction]
 fn send_dutycycled_message(
@@ -87,7 +87,7 @@ fn send_message(
         Err(_) => return -2,
     };
 
-    match send_scpi_message(
+    match lib_send_scpi_message(
         message,
         network_mode,
         &remote_client_address,
@@ -122,7 +122,7 @@ fn send_repeated_message(
         Err(_) => return -2,
     };
 
-    match send_repeated_scpi_message(
+    match lib_send_repeated_scpi_message(
         message,
         network_mode,
         &remote_client_address,

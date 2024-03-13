@@ -1,6 +1,6 @@
 # PySCPI
-PySCPI is a python module written in rust to enable fast communication to
-instruments using the SCPI protocol <em>fast</em>. No need to sacrifice
+PySCPI is a python module written in rust to enable <em>fast</em> communication
+to instruments using the SCPI protocol. No need to sacrifice
 python's readable semantics for speed.
 
 ## Building the wheel from source

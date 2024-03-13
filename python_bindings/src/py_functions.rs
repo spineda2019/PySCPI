@@ -52,7 +52,7 @@ pub fn send_dutycycled_message(
 
     match lib_send_duty_cycled_message(
         &dutycycled_message,
-        network_mode,
+        &network_mode,
         remote_client_address,
         remote_port,
         local_port,
@@ -81,7 +81,7 @@ pub fn send_message(
 
     match lib_send_scpi_message(
         message,
-        network_mode,
+        &network_mode,
         remote_client_address,
         remote_port,
         local_port,
@@ -112,7 +112,7 @@ pub fn send_repeated_message(
 
     match lib_send_repeated_scpi_message(
         message,
-        network_mode,
+        &network_mode,
         remote_client_address,
         remote_port,
         local_port,

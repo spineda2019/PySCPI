@@ -33,7 +33,7 @@ impl Messenger {
         local_port: u16,
         remote_port: u16,
         remote_client: &IpAddr,
-        mode: NetworkMode,
+        mode: &NetworkMode,
     ) -> Result<Self, Error> {
         let local_host: IpAddr = match IpAddr::from_str("0.0.0.0") {
             Ok(x) => x,

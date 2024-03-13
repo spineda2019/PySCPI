@@ -87,7 +87,7 @@ impl ScpiMessenger {
         };
 
         let inner: Messenger =
-            Messenger::new(local_port, remote_port, &remote_client.address, scpi_mode)?;
+            Messenger::new(local_port, remote_port, &remote_client.address, &scpi_mode)?;
 
         Ok(Self { inner })
     }

@@ -31,7 +31,7 @@ mod tests {
         const REMOTE_PORT: u16 = 5025;
         const LOCAL_PORT: u16 = 42;
 
-        assert!(send_scpi_message(MESSAGE, MODE, &remote_client, REMOTE_PORT, LOCAL_PORT).is_ok());
+        assert!(send_scpi_message(MESSAGE, &MODE, &remote_client, REMOTE_PORT, LOCAL_PORT).is_ok());
 
         Ok(())
     }
@@ -46,7 +46,7 @@ mod tests {
 
         assert!(send_repeated_scpi_message(
             MESSAGE,
-            MODE,
+            &MODE,
             &remote_client,
             REMOTE_PORT,
             LOCAL_PORT,

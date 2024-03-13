@@ -27,7 +27,7 @@ use networking::NetworkMode;
 
 pub fn send_scpi_message(
     message: &str,
-    mode: NetworkMode,
+    mode: &NetworkMode,
     remote_client: &IpAddr,
     remote_port: u16,
     local_port: u16,
@@ -38,7 +38,7 @@ pub fn send_scpi_message(
 
 pub fn send_repeated_scpi_message(
     message: &str,
-    mode: NetworkMode,
+    mode: &NetworkMode,
     remote_client: &IpAddr,
     remote_port: u16,
     local_port: u16,
@@ -70,7 +70,7 @@ pub fn send_repeated_scpi_message(
 
 pub fn send_duty_cycled_message(
     duty_cycle_message: &DutyCycleMessage,
-    mode: NetworkMode,
+    mode: &NetworkMode,
     remote_client: &IpAddr,
     remote_port: u16,
     local_port: u16,

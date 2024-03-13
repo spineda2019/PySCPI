@@ -99,6 +99,10 @@ impl ScpiMessenger {
         }
     }
 
+    fn send_list_of_messages(&mut self, messages: Vec<&str>) -> Result<(), Error> {
+        self.inner.send_list_of_messages(&messages)
+    }
+
     fn send_duty_cycled_message(
         &mut self,
         messages: (&str, &str),

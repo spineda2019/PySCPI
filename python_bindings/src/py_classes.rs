@@ -17,20 +17,39 @@
 use std::{io::Error, net::IpAddr, str::FromStr};
 
 use pyo3::{pyclass, pymethods};
+use scpi::duty_cycle::DutyCycleMessage;
 use scpi::messenger::Messenger;
 use scpi::networking::NetworkMode;
 
 #[derive(Clone)]
 #[pyclass]
-enum ScpiNetworkMode {
-    Udp = 0,
-    Tcp = 1,
-    UdpMulticast = 2,
-    TcpMulticast = 3,
+pub enum ScpiNetworkMode {
+    Udp,
+    Tcp,
+    UdpMulticast,
+    TcpMulticast,
+}
+
+#[pymethods]
+impl ScpiNetworkMode {
+    #[new]
+    fn new(mode: u8) -> Result<ScpiNetworkMode, Error> {
+        match mode {
+            0 => Ok(Self::Udp),
+            1 => Ok(Self::Tcp),
+            2 => Ok(Self::UdpMulticast),
+            3 => Ok(Self::TcpMulticast),
+            _ => {
+                const MSG: &str = "Not a valid enum in range [0, 4]";
+                eprintln!("{}", MSG);
+                Err(Error::new(std::io::ErrorKind::NotFound, MSG))
+            }
+        }
+    }
 }
 
 #[pyclass]
-struct ScpiMessenger {
+pub struct ScpiMessenger {
     inner: Messenger,
 }
 
@@ -63,5 +82,27 @@ impl ScpiMessenger {
             Messenger::new(local_port, remote_port, &remote_client_address, scpi_mode)?;
 
         Ok(Self { inner })
+    }
+
+    fn send_message(&mut self, message: &str) -> isize {
+        match self.inner.send_message(message) {
+            Ok(x) => x as isize,
+            Err(_) => -1,
+        }
+    }
+
+    fn send_duty_cycled_message(
+        &mut self,
+        messages: (&str, &str),
+        microsecond_times: (u64, u64),
+    ) -> Result<(), Error> {
+        let message: DutyCycleMessage = DutyCycleMessage::new(
+            microsecond_times.0,
+            microsecond_times.1,
+            messages.0,
+            messages.1,
+        );
+
+        self.inner.send_duty_cycled_message(&message)
     }
 }

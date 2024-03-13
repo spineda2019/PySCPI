@@ -51,7 +51,7 @@ impl ScpiNetworkMode {
 
 #[pyclass]
 pub struct IpAddress {
-    address: IpAddr,
+    pub address: IpAddr,
 }
 
 #[pymethods]

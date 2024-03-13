@@ -14,9 +14,10 @@
    limitations under the License.
 */
 
+use pyo3::{pyclass, pymethods};
+use std::net::AddrParseError;
 use std::{io::Error, net::IpAddr, str::FromStr};
 
-use pyo3::{pyclass, pymethods};
 use scpi::duty_cycle::DutyCycleMessage;
 use scpi::messenger::Messenger;
 use scpi::networking::NetworkMode;
@@ -49,6 +50,22 @@ impl ScpiNetworkMode {
 }
 
 #[pyclass]
+pub struct IpAddress {
+    address: IpAddr,
+}
+
+#[pymethods]
+impl IpAddress {
+    #[new]
+    pub fn new(address: &str) -> Result<Self, AddrParseError> {
+        let rust_address: IpAddr = IpAddr::from_str(address)?;
+        Ok(Self {
+            address: rust_address,
+        })
+    }
+}
+
+#[pyclass]
 pub struct ScpiMessenger {
     inner: Messenger,
 }
@@ -59,18 +76,9 @@ impl ScpiMessenger {
     fn new(
         local_port: u16,
         remote_port: u16,
-        remote_client: &str,
+        remote_client: &IpAddress,
         mode: ScpiNetworkMode,
     ) -> Result<Self, Error> {
-        let remote_client_address: IpAddr = match IpAddr::from_str(remote_client) {
-            Ok(x) => x,
-            Err(_) => {
-                const MSG: &str = "Error Parsing ip address";
-                eprintln!("{}", MSG);
-                return Err(Error::new(std::io::ErrorKind::Interrupted, MSG));
-            }
-        };
-
         let scpi_mode: NetworkMode = match mode {
             ScpiNetworkMode::Udp => NetworkMode::Udp,
             ScpiNetworkMode::Tcp => NetworkMode::Tcp,
@@ -79,7 +87,7 @@ impl ScpiMessenger {
         };
 
         let inner: Messenger =
-            Messenger::new(local_port, remote_port, &remote_client_address, scpi_mode)?;
+            Messenger::new(local_port, remote_port, &remote_client.address, scpi_mode)?;
 
         Ok(Self { inner })
     }

@@ -92,11 +92,8 @@ impl ScpiMessenger {
         Ok(Self { inner })
     }
 
-    fn send_message(&mut self, message: &str) -> isize {
-        match self.inner.send_message(message) {
-            Ok(x) => x as isize,
-            Err(_) => -1,
-        }
+    fn send_message(&mut self, message: &str) -> Result<usize, Error> {
+        self.inner.send_message(message)
     }
 
     fn send_list_of_messages(&mut self, messages: Vec<&str>) -> Result<(), Error> {

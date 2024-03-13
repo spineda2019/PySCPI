@@ -14,37 +14,35 @@
    limitations under the License.
 */
 
-use std::net::IpAddr;
-use std::str::FromStr;
-
 use pyo3::pyfunction;
+use std::net::IpAddr;
+
 use scpi::duty_cycle::DutyCycleMessage;
 use scpi::networking::NetworkMode;
 use scpi::send_duty_cycled_message as lib_send_duty_cycled_message;
 use scpi::send_repeated_scpi_message as lib_send_repeated_scpi_message;
 use scpi::send_scpi_message as lib_send_scpi_message;
 
+use crate::py_classes::IpAddress;
+use crate::py_classes::ScpiNetworkMode;
+
 #[pyfunction]
 pub fn send_dutycycled_message(
     messages: (&str, &str),
     times: (u64, u64),
-    mode: u8,
-    remote_client: &str,
+    mode: &ScpiNetworkMode,
+    remote_client: &IpAddress,
     remote_port: u16,
     local_port: u16,
 ) -> isize {
     let network_mode: NetworkMode = match mode {
-        0 => NetworkMode::Udp,
-        1 => NetworkMode::Tcp,
-        2 => NetworkMode::UdpMulticast,
-        3 => NetworkMode::TcpMulticast,
-        _ => return -1,
+        ScpiNetworkMode::Udp => NetworkMode::Udp,
+        ScpiNetworkMode::Tcp => NetworkMode::Tcp,
+        ScpiNetworkMode::UdpMulticast => NetworkMode::UdpMulticast,
+        ScpiNetworkMode::TcpMulticast => NetworkMode::TcpMulticast,
     };
 
-    let remote_client_address: IpAddr = match IpAddr::from_str(remote_client) {
-        Ok(x) => x,
-        Err(_) => return -2,
-    };
+    let remote_client_address: &IpAddr = &remote_client.address;
 
     let (first_message, second_message): (&str, &str) = messages;
     let (first_time, second_time): (u64, u64) = times;
@@ -55,7 +53,7 @@ pub fn send_dutycycled_message(
     match lib_send_duty_cycled_message(
         &dutycycled_message,
         network_mode,
-        &remote_client_address,
+        remote_client_address,
         remote_port,
         local_port,
     ) {
@@ -67,28 +65,24 @@ pub fn send_dutycycled_message(
 #[pyfunction]
 pub fn send_message(
     message: &str,
-    mode: u8,
-    remote_client: &str,
+    mode: &ScpiNetworkMode,
+    remote_client: &IpAddress,
     remote_port: u16,
     local_port: u16,
 ) -> isize {
     let network_mode: NetworkMode = match mode {
-        0 => NetworkMode::Udp,
-        1 => NetworkMode::Tcp,
-        2 => NetworkMode::UdpMulticast,
-        3 => NetworkMode::TcpMulticast,
-        _ => return -1,
+        ScpiNetworkMode::Udp => NetworkMode::Udp,
+        ScpiNetworkMode::Tcp => NetworkMode::Tcp,
+        ScpiNetworkMode::UdpMulticast => NetworkMode::UdpMulticast,
+        ScpiNetworkMode::TcpMulticast => NetworkMode::TcpMulticast,
     };
 
-    let remote_client_address: IpAddr = match IpAddr::from_str(remote_client) {
-        Ok(x) => x,
-        Err(_) => return -2,
-    };
+    let remote_client_address: &IpAddr = &remote_client.address;
 
     match lib_send_scpi_message(
         message,
         network_mode,
-        &remote_client_address,
+        remote_client_address,
         remote_port,
         local_port,
     ) {
@@ -101,29 +95,25 @@ pub fn send_message(
 #[pyo3(signature = (message, mode, remote_client, remote_port, local_port, repititions=None))]
 pub fn send_repeated_message(
     message: &str,
-    mode: u8,
-    remote_client: &str,
+    mode: &ScpiNetworkMode,
+    remote_client: &IpAddress,
     remote_port: u16,
     local_port: u16,
     repititions: Option<usize>,
 ) -> isize {
     let network_mode: NetworkMode = match mode {
-        0 => NetworkMode::Udp,
-        1 => NetworkMode::Tcp,
-        2 => NetworkMode::UdpMulticast,
-        3 => NetworkMode::TcpMulticast,
-        _ => return -1,
+        ScpiNetworkMode::Udp => NetworkMode::Udp,
+        ScpiNetworkMode::Tcp => NetworkMode::Tcp,
+        ScpiNetworkMode::UdpMulticast => NetworkMode::UdpMulticast,
+        ScpiNetworkMode::TcpMulticast => NetworkMode::TcpMulticast,
     };
 
-    let remote_client_address: IpAddr = match IpAddr::from_str(remote_client) {
-        Ok(x) => x,
-        Err(_) => return -2,
-    };
+    let remote_client_address: &IpAddr = &remote_client.address;
 
     match lib_send_repeated_scpi_message(
         message,
         network_mode,
-        &remote_client_address,
+        remote_client_address,
         remote_port,
         local_port,
         repititions,

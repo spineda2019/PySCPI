@@ -100,13 +100,14 @@ fn send_message(
 }
 
 #[pyfunction]
+#[pyo3(signature = (message, mode, remote_client, remote_port, local_port, repititions=None))]
 fn send_repeated_message(
     message: &str,
     mode: u8,
     remote_client: &str,
     remote_port: u16,
     local_port: u16,
-    repititions: isize,
+    repititions: Option<usize>,
 ) -> isize {
     let network_mode: NetworkMode = match mode {
         0 => NetworkMode::Udp,
@@ -121,18 +122,13 @@ fn send_repeated_message(
         Err(_) => return -2,
     };
 
-    let message_repititons: Option<usize> = match repititions {
-        x if x >= 0 => Some(x as usize),
-        _ => None,
-    };
-
     match send_repeated_scpi_message(
         message,
         network_mode,
         &remote_client_address,
         remote_port,
         local_port,
-        message_repititons,
+        repititions,
     ) {
         Ok(x) => x as isize,
         Err(_) => -3,

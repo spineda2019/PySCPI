@@ -103,8 +103,8 @@ impl Messenger {
         let (first_time, second_time): (u64, u64) = message.get_times();
         let (first_message, second_message): (&str, &str) = message.get_messages();
 
-        let first_interval = std::time::Duration::from_millis(first_time);
-        let second_interval = std::time::Duration::from_millis(second_time);
+        let first_interval = std::time::Duration::from_micros(first_time);
+        let second_interval = std::time::Duration::from_micros(second_time);
 
         loop {
             let start: std::time::Instant = std::time::Instant::now();

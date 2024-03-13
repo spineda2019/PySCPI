@@ -17,6 +17,7 @@
 use std::isize;
 use std::net::IpAddr;
 use std::str::FromStr;
+mod py_classes;
 
 use pyo3::prelude::*;
 use scpi::duty_cycle::DutyCycleMessage;
@@ -143,5 +144,7 @@ fn py_scpi(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(send_message, m)?)?;
     m.add_function(wrap_pyfunction!(send_repeated_message, m)?)?;
     m.add_function(wrap_pyfunction!(send_dutycycled_message, m)?)?;
+    m.add_class::<py_classes::ScpiNetworkMode>()?;
+    m.add_class::<py_classes::ScpiMessenger>()?;
     Ok(())
 }

@@ -15,7 +15,7 @@
 */
 
 pub mod duty_cycle;
-mod messenger;
+pub mod messenger;
 pub mod networking;
 mod unit_tests;
 

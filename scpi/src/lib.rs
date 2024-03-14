@@ -36,7 +36,7 @@ pub fn send_scpi_message(
     messenger.send_message(message)
 }
 
-pub fn send_list_of_scpi_message(
+pub fn send_list_of_scpi_messages(
     messages: &[&str],
     mode: &NetworkMode,
     remote_client: &IpAddr,

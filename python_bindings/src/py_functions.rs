@@ -21,6 +21,7 @@ use std::net::IpAddr;
 use scpi::duty_cycle::DutyCycleMessage;
 use scpi::networking::NetworkMode;
 use scpi::send_duty_cycled_message as lib_send_duty_cycled_message;
+use scpi::send_list_of_scpi_messages as lib_send_list_of_scpi_messages;
 use scpi::send_repeated_scpi_message as lib_send_repeated_scpi_message;
 use scpi::send_scpi_message as lib_send_scpi_message;
 
@@ -79,6 +80,32 @@ pub fn send_message(
 
     lib_send_scpi_message(
         message,
+        &network_mode,
+        remote_client_address,
+        remote_port,
+        local_port,
+    )
+}
+
+#[pyfunction]
+pub fn send_list_of_messages(
+    messages: Vec<&str>,
+    mode: &ScpiNetworkMode,
+    remote_client: &IpAddress,
+    remote_port: u16,
+    local_port: u16,
+) -> Result<(), Error> {
+    let network_mode: NetworkMode = match mode {
+        ScpiNetworkMode::Udp => NetworkMode::Udp,
+        ScpiNetworkMode::Tcp => NetworkMode::Tcp,
+        ScpiNetworkMode::UdpMulticast => NetworkMode::UdpMulticast,
+        ScpiNetworkMode::TcpMulticast => NetworkMode::TcpMulticast,
+    };
+
+    let remote_client_address: &IpAddr = &remote_client.address;
+
+    lib_send_list_of_scpi_messages(
+        &messages,
         &network_mode,
         remote_client_address,
         remote_port,

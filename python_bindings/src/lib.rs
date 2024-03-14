@@ -18,12 +18,15 @@ mod py_classes;
 mod py_functions;
 
 use py_classes::{IpAddress, ScpiMessenger, ScpiNetworkMode};
-use py_functions::{send_dutycycled_message, send_message, send_repeated_message};
+use py_functions::{
+    send_dutycycled_message, send_list_of_messages, send_message, send_repeated_message,
+};
 use pyo3::prelude::*;
 
 #[pymodule]
 fn py_scpi(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(send_message, m)?)?;
+    m.add_function(wrap_pyfunction!(send_list_of_messages, m)?)?;
     m.add_function(wrap_pyfunction!(send_repeated_message, m)?)?;
     m.add_function(wrap_pyfunction!(send_dutycycled_message, m)?)?;
     m.add_class::<ScpiNetworkMode>()?;

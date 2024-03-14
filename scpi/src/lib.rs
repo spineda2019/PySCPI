@@ -36,6 +36,17 @@ pub fn send_scpi_message(
     messenger.send_message(message)
 }
 
+pub fn send_list_of_scpi_message(
+    messages: &[&str],
+    mode: &NetworkMode,
+    remote_client: &IpAddr,
+    remote_port: u16,
+    local_port: u16,
+) -> Result<(), Error> {
+    let mut messenger: Messenger = Messenger::new(local_port, remote_port, remote_client, mode)?;
+    messenger.send_list_of_messages(messages)
+}
+
 pub fn send_repeated_scpi_message(
     message: &str,
     mode: &NetworkMode,

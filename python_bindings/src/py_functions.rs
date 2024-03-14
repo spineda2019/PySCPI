@@ -15,6 +15,7 @@
 */
 
 use pyo3::pyfunction;
+use std::io::Error;
 use std::net::IpAddr;
 
 use scpi::duty_cycle::DutyCycleMessage;
@@ -34,7 +35,7 @@ pub fn send_dutycycled_message(
     remote_client: &IpAddress,
     remote_port: u16,
     local_port: u16,
-) -> isize {
+) -> Result<(), Error> {
     let network_mode: NetworkMode = match mode {
         ScpiNetworkMode::Udp => NetworkMode::Udp,
         ScpiNetworkMode::Tcp => NetworkMode::Tcp,
@@ -50,16 +51,13 @@ pub fn send_dutycycled_message(
     let dutycycled_message: DutyCycleMessage =
         DutyCycleMessage::new(first_time, second_time, first_message, second_message);
 
-    match lib_send_duty_cycled_message(
+    lib_send_duty_cycled_message(
         &dutycycled_message,
         &network_mode,
         remote_client_address,
         remote_port,
         local_port,
-    ) {
-        Ok(_) => 0, // impossible
-        Err(_) => -3,
-    }
+    )
 }
 
 #[pyfunction]
@@ -69,7 +67,7 @@ pub fn send_message(
     remote_client: &IpAddress,
     remote_port: u16,
     local_port: u16,
-) -> isize {
+) -> Result<usize, Error> {
     let network_mode: NetworkMode = match mode {
         ScpiNetworkMode::Udp => NetworkMode::Udp,
         ScpiNetworkMode::Tcp => NetworkMode::Tcp,
@@ -79,16 +77,13 @@ pub fn send_message(
 
     let remote_client_address: &IpAddr = &remote_client.address;
 
-    match lib_send_scpi_message(
+    lib_send_scpi_message(
         message,
         &network_mode,
         remote_client_address,
         remote_port,
         local_port,
-    ) {
-        Ok(x) => x as isize,
-        Err(_) => -3,
-    }
+    )
 }
 
 #[pyfunction]
@@ -100,7 +95,7 @@ pub fn send_repeated_message(
     remote_port: u16,
     local_port: u16,
     repititions: Option<usize>,
-) -> isize {
+) -> Result<usize, Error> {
     let network_mode: NetworkMode = match mode {
         ScpiNetworkMode::Udp => NetworkMode::Udp,
         ScpiNetworkMode::Tcp => NetworkMode::Tcp,
@@ -110,15 +105,12 @@ pub fn send_repeated_message(
 
     let remote_client_address: &IpAddr = &remote_client.address;
 
-    match lib_send_repeated_scpi_message(
+    lib_send_repeated_scpi_message(
         message,
         &network_mode,
         remote_client_address,
         remote_port,
         local_port,
         repititions,
-    ) {
-        Ok(x) => x as isize,
-        Err(_) => -3,
-    }
+    )
 }

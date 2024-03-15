@@ -1,3 +1,3 @@
 [workspace]
-members = ["scpi", "python_bindings"]
+members = ["scpi", "python_bindings", "rs232"]
 resolver = "2"
